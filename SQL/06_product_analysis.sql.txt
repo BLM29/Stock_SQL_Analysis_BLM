@@ -1,0 +1,77 @@
+-- =========================================================
+-- Calcul des principaux KPI de gestion de stock
+-- =========================================================
+
+-- Requêtes à réaliser individuellement -> 
+
+-- ---------------------------------------------------------
+-- KPI 1 : taux de rupture de stock
+-- Pourcentage de lignes de stock pour lesquelles
+-- la quantité en stock est égale à 0. Utilisation de CASE WHEN pour calculer le taux.
+-- ---------------------------------------------------------
+
+SELECT
+    ROUND(
+        100.0 * SUM(CASE WHEN quantite_stock = 0 THEN 1 ELSE 0 END) / COUNT(*),
+        2
+    ) AS taux_rupture_stock
+FROM stock;
+
+
+-- ---------------------------------------------------------
+-- KPI 2 : niveau moyen de stock
+-- Quantité moyenne disponible sur l'ensemble des lignes
+-- de la table stock
+-- ---------------------------------------------------------
+
+SELECT
+    ROUND(AVG(quantite_stock), 2) AS niveau_moyen_stock
+FROM stock;
+
+
+-- ---------------------------------------------------------
+-- KPI 3 : couverture moyenne de stock
+-- Nombre moyen de jours pendant lesquels le stock
+-- actuel permet de couvrir la demande journalière
+-- La multiplication par 1.0 force PostgreSQL à produire un résultat avec des décimales, le NULLIF pour éviter les problèmes de division par 0, en prenant la valeur null
+
+-- ---------------------------------------------------------
+
+SELECT
+    ROUND(AVG(1.0 * quantite_stock / NULLIF(demande_journaliere, 0)), 2) AS couverture_moyenne_stock
+FROM stock;
+
+
+-- ---------------------------------------------------------
+-- KPI 4 : taux de disponibilité par entrepôt
+-- Pourcentage de lignes pour lesquelles le produit
+-- est disponible (quantite_stock > 0). Utilisation de CASE WHEN pour calculer le taux.
+-- ---------------------------------------------------------
+
+SELECT
+    e.nom_entrepot,
+    ROUND(
+        100.0 * SUM(CASE WHEN s.quantite_stock > 0 THEN 1 ELSE 0 END) / COUNT(*),
+        2
+    ) AS taux_disponibilite
+FROM stock s
+JOIN entrepots e
+    ON s.id_entrepot = e.id_entrepot
+GROUP BY e.nom_entrepot
+ORDER BY taux_disponibilite DESC;
+
+
+-- ---------------------------------------------------------
+-- KPI 5 : fréquence de réapprovisionnement par entrepôt
+-- Nombre de commandes de réapprovisionnement enregistrées
+-- par entrepôt
+-- ---------------------------------------------------------
+
+SELECT
+    e.nom_entrepot,
+    COUNT(r.id_reapprovisionnement) AS nombre_reapprovisionnements
+FROM reapprovisionnements r
+JOIN entrepots e
+    ON r.id_entrepot = e.id_entrepot
+GROUP BY e.nom_entrepot
+ORDER BY nombre_reapprovisionnements DESC;
