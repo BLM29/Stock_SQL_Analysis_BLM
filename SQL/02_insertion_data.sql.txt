@@ -1,0 +1,32 @@
+-- =========================================================
+-- Insertion des données du projet
+-- =========================================================
+
+-- ---------------------------------------------------------
+-- Table : produits
+-- Insertion du catalogue de produits analysés
+-- Chaque ligne représente une référence du catalogue
+-- ---------------------------------------------------------
+
+INSERT INTO produits (id_produit, nom_produit, categorie, cout_unitaire) VALUES
+(1, 'Ordinateur portable', 'Electronique', 850.00),
+(2, 'Souris sans fil', 'Electronique', 20.00),
+(3, 'Chaise de bureau', 'Mobilier', 120.00),
+(4, 'Lampe de bureau', 'Mobilier', 35.00),
+(5, 'Cable USB', 'Accessoires', 8.00),
+(6, 'Ecran 24 pouces', 'Electronique', 180.00),
+(7, 'Clavier', 'Accessoires', 25.00),
+(8, 'Station accueil', 'Electronique', 150.00),
+(9, 'Lot cahiers', 'Fournitures', 12.00),
+(10, 'Sac a dos', 'Accessoires', 45.00);
+
+-- ---------------------------------------------------------
+-- Table : entrepots
+-- Insertion des entrepôts logistiques
+-- Trois sites régionaux sont simulés dans ce dataset
+-- ---------------------------------------------------------
+
+INSERT INTO entrepots (id_entrepot, nom_entrepot, region) VALUES
+(1, 'Entrepot Paris', 'Nord'),
+(2, 'Entrepot Lyon', 'Sud-Est'),
+(3, 'Entrepot Nantes', 'Ouest');

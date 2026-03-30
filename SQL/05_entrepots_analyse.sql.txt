@@ -1,0 +1,60 @@
+-- =========================================================
+-- Vérifications de base sur les données
+-- A noter que dans PostgreSQL, il vaut mieux compacter les requêtes de type SELECT COUNT pour les voir s'afficher en même temps 
+-- =========================================================
+
+-- ---------------------------------------------------------
+-- Vérification du nombre de lignes dans chaque table
+-- Permet de s'assurer que les insertions ont bien été effectuées
+-- ---------------------------------------------------------
+
+SELECT
+    (SELECT COUNT(*) FROM produits) AS nombre_produits,
+    (SELECT COUNT(*) FROM entrepots) AS nombre_entrepots,
+    (SELECT COUNT(*) FROM stock) AS nombre_lignes_stock,
+    (SELECT COUNT(*) FROM reapprovisionnements) AS nombre_reapprovisionnements;
+
+
+
+-- Requêtes à réaliser individuellement -> 
+
+
+-- ---------------------------------------------------------
+-- Vérification des incohérences dans la table stock
+-- Les valeurs négatives ou nulles seraient anormales
+-- ---------------------------------------------------------
+
+SELECT *
+FROM stock
+WHERE quantite_stock < 0
+   OR demande_journaliere <= 0
+   OR point_commande < 0;
+
+
+-- ---------------------------------------------------------
+-- Identification des ruptures de stock
+-- ---------------------------------------------------------
+
+SELECT *
+FROM stock
+WHERE quantite_stock = 0;
+
+
+-- ---------------------------------------------------------
+-- Identification des produits sous le point de commande
+-- Ces produits devraient normalement déclencher le réappro
+-- ---------------------------------------------------------
+
+SELECT *
+FROM stock
+WHERE quantite_stock < point_commande;
+
+
+-- ---------------------------------------------------------
+-- Vérification des incohérences dans les réapprovisionnements
+-- ---------------------------------------------------------
+
+SELECT *
+FROM reapprovisionnements
+WHERE quantite_commandee <= 0
+   OR date_livraison < date_commande;

@@ -1,0 +1,71 @@
+-- =========================================================
+-- Insertion des données de réapprovisionnement
+-- =========================================================
+
+-- ---------------------------------------------------------
+-- Table : reapprovisionnements
+--
+-- Chaque ligne représente une commande de réapprovisionnement
+-- passée pour un produit dans un entrepôt donné.
+--
+-- Les données ont été construites pour :
+-- - refléter des tensions observées dans la table stock
+-- - montrer des réapprovisionnements déclenchés après rupture
+-- - illustrer des besoins de reconstitution de stock
+-- ---------------------------------------------------------
+
+
+-- ---------------------------------------------------------
+-- Réapprovisionnements liés à l'entrepôt de Lyon
+-- Plusieurs produits sont sous tension ou en rupture
+-- ---------------------------------------------------------
+
+INSERT INTO reapprovisionnements (
+    id_reapprovisionnement,
+    id_produit,
+    id_entrepot,
+    date_commande,
+    date_livraison,
+    quantite_commandee
+) VALUES
+(1, 1, 2, '2025-01-02', '2025-01-05', 12),
+(2, 3, 2, '2025-01-03', '2025-01-06', 15),
+(3, 5, 2, '2025-01-02', '2025-01-06', 30),
+(4, 7, 2, '2025-01-03', '2025-01-06', 20),
+(5, 10, 2, '2025-01-03', '2025-01-06', 10);
+
+
+-- ---------------------------------------------------------
+-- Réapprovisionnements liés à l'entrepôt de Nantes
+-- Certaines références présentent des situations critiques
+-- ---------------------------------------------------------
+
+INSERT INTO reapprovisionnements (
+    id_reapprovisionnement,
+    id_produit,
+    id_entrepot,
+    date_commande,
+    date_livraison,
+    quantite_commandee
+) VALUES
+(6, 3, 3, '2025-01-03', '2025-01-07', 20),
+(7, 6, 3, '2025-01-04', '2025-01-07', 18),
+(8, 8, 3, '2025-01-04', '2025-01-08', 15),
+(9, 9, 3, '2025-01-02', '2025-01-05', 25);
+
+
+-- ---------------------------------------------------------
+-- Réapprovisionnements ponctuels pour l'entrepôt de Paris
+-- Moins de tension, mais quelques ajustements nécessaires
+-- ---------------------------------------------------------
+
+INSERT INTO reapprovisionnements (
+    id_reapprovisionnement,
+    id_produit,
+    id_entrepot,
+    date_commande,
+    date_livraison,
+    quantite_commandee
+) VALUES
+(10, 5, 1, '2025-01-03', '2025-01-05', 20),
+(11, 8, 1, '2025-01-04', '2025-01-06', 10);

@@ -1,0 +1,96 @@
+-- =========================================================
+-- Analyses détaillées de la gestion de stock
+-- =========================================================
+
+-- Les requêtes ci-dessous permettent d'identifier
+-- les produits et les entrepôts les plus exposés
+-- aux ruptures et aux tensions.
+
+
+-- ---------------------------------------------------------
+-- Analyse 1 : produits sous le point de commande
+-- Cette requête identifie les références pour lesquelles
+-- le stock disponible est inférieur au seuil de réapprovisionnement.
+-- ---------------------------------------------------------
+
+SELECT
+    s.id_stock,
+    p.nom_produit,
+    e.nom_entrepot,
+    s.quantite_stock,
+    s.point_commande
+FROM stock s
+JOIN produits p
+    ON s.id_produit = p.id_produit
+JOIN entrepots e
+    ON s.id_entrepot = e.id_entrepot
+WHERE s.quantite_stock < s.point_commande
+ORDER BY s.quantite_stock ASC;
+
+
+-- ---------------------------------------------------------
+-- Analyse 2 : nombre de ruptures par entrepôt
+-- Cette requête permet d'identifier les entrepôts
+-- les plus touchés par les ruptures de stock. Utilisation de CASE WHEN pour calculer la somme.
+-- ---------------------------------------------------------
+
+SELECT
+    e.nom_entrepot,
+    SUM(CASE WHEN s.quantite_stock = 0 THEN 1 ELSE 0 END) AS nombre_ruptures
+FROM stock s
+JOIN entrepots e
+    ON s.id_entrepot = e.id_entrepot
+GROUP BY e.nom_entrepot
+ORDER BY nombre_ruptures DESC;
+
+
+-- ---------------------------------------------------------
+-- Analyse 3 : couverture moyenne par produit
+-- Cette requête mesure le nombre moyen de jours
+-- pendant lesquels le stock d'un produit permet
+-- de couvrir la demande journalière.
+-- La multiplication par 1.0 force PostgreSQL à produire un résultat avec des décimales, le NULLIF pour éviter les problèmes de division par 0, en prenant la valeur null
+-- ---------------------------------------------------------
+
+SELECT
+    p.nom_produit,
+    ROUND(AVG(1.0 * s.quantite_stock / NULLIF(s.demande_journaliere, 0)), 2) AS couverture_moyenne_jours
+FROM stock s
+JOIN produits p
+    ON s.id_produit = p.id_produit
+GROUP BY p.nom_produit
+ORDER BY couverture_moyenne_jours ASC;
+
+
+-- ---------------------------------------------------------
+-- Analyse 4 : nombre de réapprovisionnements par produit
+-- Cette requête identifie les produits
+-- les plus fréquemment réapprovisionnés.
+-- ---------------------------------------------------------
+
+SELECT
+    p.nom_produit,
+    COUNT(r.id_reapprovisionnement) AS nombre_reapprovisionnements
+FROM reapprovisionnements r
+JOIN produits p
+    ON r.id_produit = p.id_produit
+GROUP BY p.nom_produit
+ORDER BY nombre_reapprovisionnements DESC, p.nom_produit ASC;
+
+
+-- ---------------------------------------------------------
+-- Analyse 5 : valeur théorique du stock par entrepôt
+-- Cette requête estime la valeur totale du stock détenu
+-- dans chaque entrepôt.
+-- ---------------------------------------------------------
+
+SELECT
+    e.nom_entrepot,
+    ROUND(SUM(s.quantite_stock * p.cout_unitaire), 2) AS valeur_stock
+FROM stock s
+JOIN produits p
+    ON s.id_produit = p.id_produit
+JOIN entrepots e
+    ON s.id_entrepot = e.id_entrepot
+GROUP BY e.nom_entrepot
+ORDER BY valeur_stock DESC;
